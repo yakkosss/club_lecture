@@ -1,0 +1,38 @@
+besoin:
+ajout d'une fonctionnalité de section commentaire sous les lectures afin que les utilisateurs puissent y échanger directement
+
+
+exigences fonctionnelles:
+ajouter un commentaire
+associer le commentaire à une lecture
+afficher la liste des commentaires par lecture côté modération et admin
+crud complet commentaire
+
+solutions techniques:
+
+1- création d'une table et d'une classe commentaire. contient id, auteur (clé étrangère), lecture (clé étrangère), date publication, statut commentaire, commentaire parent (clé étrangère), 	niveau du commentaire, (enum en attente, validé, refusé)
+
+2- affichage d'un espace dédié sous les lectures : récupération des commentaires et affichage
+
+3- affichage pour chaque commentaire du nom de son auteur ainsi que de sa date de publication
+
+4- affichage de tous les commentaires liés à une lecture pour les administrateurs et modérateurs (accessible depuis l'espace commentaire d'une lecture via un bouton (coloration différentes 	pour les commentaires : 	- en attente
+					- refusés
+					- signalés
+
+5- chaque commentaire commentaire est supprimable et modifiable par son auteur, suprimable et signalable et éligibles à un changement de status par un administrateur ou un modérateur et 	uniquement signalable par un autre membre (gestion des droit et de l'identité) via 4 boutons accessibles et visibles en fonction du rôle
+
+6- création d'un crud complet côté back pour répondre à ce besoin.
+
+7- possibilité de répondre à un commentaire. récupération (en cliquant sur le bouton répondre associé au commentaire) de l'id du commentaire afin de l'ajouter à la propriété "commentaire 	parent" de sorte à l'afficher en dessous de ce dernier et décalé vers la droite en fonction du niveau de ce dernier (niveau 1 pour premier commentaire, 2 pour une réponse, 3 pour une 	réponse de réponse etc.. (permet d'optimiser l'affichage en calculant le niveau de décalage du commentaire à sa création plutôt qu'au chargement de la section commentaire))
+é
+8- côté optimisation, trigger sql on create calculant le niveau en fonction de s'il a un commentaire parent et si oui, du niveau de ce dernier à l'aide d'une fonction SQL
+
+
+creation 
+listing
+automatisation de niveau
+modification du statut pour role admin
+
+
+on commence par gérer 

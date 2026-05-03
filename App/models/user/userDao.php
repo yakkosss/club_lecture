@@ -8,9 +8,9 @@ require_once __DIR__ . '/user.php';
 
 class UserDao{
 
-    public static function recupTousLesUtilisateurs(){
+    public static function getAllUsers(){
 
-        $pdo = Db::seConecterBdd();
+        $pdo = Db::getConnection();
 
         $stmt = $pdo->prepare("SELECT u.id_user, u.name, u.firstname, u.email,
             u.password, r.irole_id, r.n as role FROM utilisateur u JOIN role r ON u.role_id = r.role_id");
@@ -24,7 +24,7 @@ class UserDao{
 
     public static function getUserByID(){
 
-        $pdo = Db::seConecterBdd();
+        $pdo = Db::getConnection();
 
         $stmt = $pdo->prepare("SELECT u.id_user, u.name, u.firstname, u.email,
             u.password, r.role_id, r.name as role FROM utilisateur u JOIN role r ON u.role_id = r.role_id");
@@ -36,11 +36,10 @@ class UserDao{
 
     }
 
-
     //CHANGER POUR INSTANCIER UN OBJET (UTILISER GETTER/SETTER)
     public static function createUser($user){
 
-        $pdo = Db::seConnecterBdd();
+        $pdo = Db::getConnection();
 
         $stmt = $pdo->prepare("INSERT into utilisateur (name, firstname, email, role_id, password) 
         values (:name :firstname, :email, :role_id, :password)");
@@ -58,7 +57,7 @@ class UserDao{
 
     public static function updateUser($user_id){
 
-        $pdo = Db::seConnecterBdd();
+        $pdo = Db::getConnection();
         //on veut pouvoir utiliser get user by ID pour ne pas afficher l'id dans le formulaire
         
 
@@ -78,7 +77,7 @@ class UserDao{
 
     public static function archiveUser($archived, $user_id){
 
-        $pdo = Db::seConnecterBdd();
+        $pdo = Db::getConnection();
 
         $stmt = $pdo->prepare("UPDATE utilisateur SET archived = ':archived' WHERE user_id = ':user_id'");
 

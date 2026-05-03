@@ -1,3 +1,7 @@
+CREATE DATABASE club_lecture
+CHARACTER SET utf8mb4
+COLLATE utf8mb4_general_ci;
+
 CREATE TABLE users (
     id INT AUTO_INCREMENT PRIMARY KEY,
     firstname VARCHAR(100)NOT NULL,
@@ -10,36 +14,26 @@ CREATE TABLE users (
 
 CREATE TABLE books (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    title VARCHAR(100) NOT NULL,
-    author VARCHAR(100) NOT NULL,
+    title VARCHAR(255) NOT NULL,
+    author VARCHAR(255) NOT NULL,
     synopsis TEXT,
-    cover_path VARCHAR(256),
-    release_date DATETIME DEFAULT CURRENT_TIMESTAMP,
+    cover_path VARCHAR(255),
+    release_date DATETIME DEFAULT NULL,
     created_by INT NULL,
     FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE SET NULL
 );
     
 CREATE TABLE readings (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id INT NOT NULL,
     book_id INT NOT NULL,
-    percentage INT NOT NULL CHECK (percentage BETWEEN 0 AND 100),
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    UNIQUE (user_id, book_id),
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-    FOREIGN KEY (book_id) REFERENCES books(id) ON DELETE CASCADE
-);
-    
-CREATE TABLE readings (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    book_id INT NULL,
     user_id INT NULL,
+    progression INT NOT NULL CHECK (progression BETWEEN 0 AND 100),
     note INT NOT NULL CHECK (note BETWEEN 0 AND 20),
     comment TEXT NOT NULL,
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     UNIQUE (book_id, user_id),
-    FOREIGN KEY (book_id) REFERENCES books(id) ON DELETE SET NULL,
+    FOREIGN KEY (book_id) REFERENCES books(id),
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
 );
     

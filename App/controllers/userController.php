@@ -6,7 +6,7 @@ class UserController{
     public static function index(){
 
     //récupérer et lister les données
-    $users = UserDao::recupTousLesUtilisateurs();
+    $users = UserDao::getAllUsers();
     require_once __DIR__ . '/../views/users/index.php';
 
     }

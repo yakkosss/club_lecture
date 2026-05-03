@@ -4,10 +4,11 @@ class book {
     private int $id;
     private string $title;
     private string $author;
-    private string
-    private int $year;
+    private string $synopsis;
+    private int $release_date;
 
-    public function __construct($Id, $Title, $Author, $Year) {
+
+    public function __construct($Id, $Title, $Author, $release_date) {
         $this->id = $Id;
         $this->title = $Title;
         $this->author = $Author;

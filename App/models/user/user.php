@@ -1,45 +1,46 @@
 <?php
 class User {
         
-    private int $id;
-    private string $name;
+    private ?int $id;
     private string $firstname;
+    private string $lastname;
     private string $email;
-    private string $password;
+    private string $passwordHash;
     private int $role;
-    private int $created_at;
+    private ?DateTime $createdAt;
 
-    public function __construct(int $id, string $name, string $firstname, string $email, string $password, int $role) {
+    public function __construct(string $firstname, string $lastname, string $email, string $passwordHash, int $role, ?int $id = null, ?DateTime $createdAt = null) {
         $this->id = $id;
-        $this->name = $name;
         $this->firstname = $firstname;
-        $this->email = $email;
-        $this->password = $password;
+        $this->lastname = $lastname;
+        $this->email = $email;  
+        $this->passwordHash = $passwordHash;
         $this->role = $role;
+        $this->createdAt = $createdAt;
     }
 
-    public function getIdUser() {
+    public function getId() {
         return $this->id;
     }
 
-    public function getName() {
-        return $this->name;
+    public function getFirstname() {
+        return $this->firstname;
     }
 
-    public function getFirstName() {
-        return $this->firstname;
+    public function getLastname() {
+        return $this->lastname;
     }
 
     public function getEmail() {
         return $this->email;
     }
 
-    public function getPassword() {
-        return $this->password;
+    public function getRoleId() {
+        return $this->role;
     }
 
-    public function getRole() {
-        return $this->role;
+    public function getPasswordHash(): string {
+        return $this->passwordHash;
     }
 
 }

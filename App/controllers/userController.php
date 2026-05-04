@@ -1,18 +1,18 @@
 <?php
-require_once __DIR__ . '/../models/userDao.php';
+require_once __DIR__ . '/../models/user/userDao.php';
 
 class UserController{
 
     public static function index(){
 
     //récupérer et lister les données
-    $users = UserDao::getAllUsers();
-    require_once __DIR__ . '/../views/users/index.php';
+        $users = UserDao::getAllUsers();
+        require_once __DIR__ . '/../views/users/index.php';
 
     }
 
     public static function displayCreateForm(){
-        require_once __DIR__ . '/../views/users/create.php';
+        require_once __DIR__ . '/../views/user/create.php';
     }
     
     public static function displayUpdateForm(){
@@ -28,19 +28,18 @@ class UserController{
     }
     public function createUser(){
       
-        $nom = trim($_POST['name']) ?? '';
-        $prenom = trim($_POST['firstname']) ?? '';
+        $firstname = trim($_POST['firstname']) ?? '';
+        $lastname = trim($_POST['lastname']) ?? '';
         $email =trim($_POST['email']) ?? '';
         $role =(int)$_POST['role_id'] ?? 0;
-        $password = password_hash("test", PASSWORD_DEFAULT);
+        $password = password_hash(trim($_POST['password']), PASSWORD_DEFAULT);
 
-        userDao::createUser($name, $firstname, $email, $role, $password);
+        userDao::createUser(new User($firstname, $lastname, $email, $password, $role));
 
          //redirection
-        header('Location: index.php?controller=UserController&action=index');
+        //header('Location: index.php?controller=UserController&action=index');
 
         exit;
-
     }
     
     public function updateUser(){

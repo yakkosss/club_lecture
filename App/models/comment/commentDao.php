@@ -1,9 +1,9 @@
 <?php
 
-require_once __DIR__ . '/../config/db.php';
-require_once __DIR__ . '/../models/user.php';
-require_once __DIR__ . '/../models/book.php';
-require_once __DIR__ . '/../models/reading.php';
+require_once __DIR__ . '/../config/Db.php';
+require_once __DIR__ . '/../models/user/User.php';
+require_once __DIR__ . '/../models/book/Book.php';
+require_once __DIR__ . '/../models/reading/Reading.php';
 
 class commentsDao {
 

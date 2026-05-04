@@ -1,6 +1,6 @@
 <?php
-require_once __DIR__ . '/../config/db.php';
-require_once __DIR__ . '/book.php';
+require_once __DIR__ . '/../config/Db.php';
+require_once __DIR__ . '/Book.php';
 
 class BookDao{
 

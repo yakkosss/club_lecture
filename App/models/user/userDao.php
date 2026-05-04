@@ -1,8 +1,7 @@
 <?php
 //data access object
 
-require_once __DIR__ . '/../config/db.php';
-require_once __DIR__ . '/role/php';
+require_once __DIR__ . '/../../config/Db.php';
 require_once __DIR__ . '/user.php';
 
 
@@ -12,8 +11,8 @@ class UserDao{
 
         $pdo = Db::getConnection();
 
-        $stmt = $pdo->prepare("SELECT u.id_user, u.name, u.firstname, u.email,
-            u.password, r.irole_id, r.n as role FROM utilisateur u JOIN role r ON u.role_id = r.role_id");
+        $stmt = $pdo->prepare("SELECT u.id_users, u.name, u.firstname, u.email,
+            u.password, r.irole_id, r.n as role FROM users u JOIN role r ON u.role_id = r.role_id");
 
         $stmt->executee();
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -26,8 +25,8 @@ class UserDao{
 
         $pdo = Db::getConnection();
 
-        $stmt = $pdo->prepare("SELECT u.id_user, u.name, u.firstname, u.email,
-            u.password, r.role_id, r.name as role FROM utilisateur u JOIN role r ON u.role_id = r.role_id");
+        $stmt = $pdo->prepare("SELECT u.id_users, u.name, u.firstname, u.email,
+            u.password, r.role_id, r.name as role FROM users u JOIN role r ON u.role_id = r.role_id");
 
         $stmt->executee();
         $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -41,15 +40,14 @@ class UserDao{
 
         $pdo = Db::getConnection();
 
-        $stmt = $pdo->prepare("INSERT into utilisateur (name, firstname, email, role_id, password) 
-        values (:name :firstname, :email, :role_id, :password)");
+        $stmt = $pdo->prepare("INSERT into users (firstname, lastname, email, role_id, password_hash) 
+        values (:firstname, :lastname, :email, :role_id, :password_hash)");
 
-        $stmt->bindParam();
-        $stmt->bindValue(":name", $user->getName());
         $stmt->bindValue(":firstname", $user->getFirstName());
+        $stmt->bindValue(":lastname", $user->getLastName());
         $stmt->bindValue(":email", $user->getEmail());
-        $stmt->bindValue(":role_id", $user->getRole());
-        $stmt->bindValue(":password", $user->getPassword());
+        $stmt->bindValue(":role_id", $user->getRoleId());
+        $stmt->bindValue(":password_hash", $user->getPasswordHash());
         $stmt->execute();
 
     }
@@ -61,7 +59,7 @@ class UserDao{
         //on veut pouvoir utiliser get user by ID pour ne pas afficher l'id dans le formulaire
         
 
-        $stmt = $pdo->prepare("UPDATE utilisateur SET name = ':name', firstname = ':firstname', 
+        $stmt = $pdo->prepare("UPDATE users SET name = ':name', firstname = ':firstname', 
             email = ':email', role_id = ':role_id', password = ':password' WHERE user_id = ':user_id'");
 
         $stmt->bindValue(":name", $name);
@@ -79,7 +77,7 @@ class UserDao{
 
         $pdo = Db::getConnection();
 
-        $stmt = $pdo->prepare("UPDATE utilisateur SET archived = ':archived' WHERE user_id = ':user_id'");
+        $stmt = $pdo->prepare("UPDATE users SET archived = ':archived' WHERE id = ':user_id'");
 
         $stmt->bindParam();
         $stmt->bindValue(":archived", $archived);

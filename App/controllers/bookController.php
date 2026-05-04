@@ -1,9 +1,9 @@
 <?php
-require_once __DIR__ . '/../models/bookDao.php';
+require_once __DIR__ . '/../models/book/BookDao.php';
 
 class BookController{
 
-    public static function index(){};
+    public static function index(){}
 
     public function createBook(){
         $title = trim($_POST['title'] ?? '');

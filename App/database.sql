@@ -4,12 +4,18 @@ COLLATE utf8mb4_general_ci;
 
 CREATE TABLE users (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    firstname VARCHAR(100)NOT NULL,
+    firstname VARCHAR(100) NOT NULL,
     lastname VARCHAR(100) NOT NULL,
     email VARCHAR(100) UNIQUE NOT NULL,
-    password_hash VARCHAR(255) NOT NULL, 
-    role ENUM('ADMIN', 'MODERATOR', 'MEMBER') NOT NULL,
-    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+    password_hash VARCHAR(255) NOT NULL,
+    role_id INT NOT NULL,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (role_id) REFERENCES roles(id)
+);
+
+CREATE TABLE roles (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(50) UNIQUE NOT NULL
 );
 
 CREATE TABLE books (

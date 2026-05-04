@@ -36,3 +36,162 @@ modification du statut pour role admin
 
 
 on commence par gérer 
+
+
+
+
+
+voici mon formulaire:
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Création utilisateur</title>
+</head>
+<body>
+    <h2>Créer un utilisateur</h2>
+    <form action="/../App/controllers/userController.php?action=createUser" method="POST">
+        
+        <label for="firstname">Prénom</label>
+        <input type="text" name="firstname" id="firstname" required>
+
+        <label for="lastname">Nom</label>
+        <input type="text" name="lastname" id="lastname" required>
+
+        <label for="email">email</label>
+        <input type="email" name="email" id="email" required>
+
+        <label for="password">Mot de passe</label>
+        <input type="password" name="password" id="password" required>
+
+        <label for="role_id">Rôle</label>
+        <select name="role_id" id="role_id" required>
+            <option value="1">Administrateur</option>
+            <option value="2">Moderateur</option>
+            <option value="3">Membre</option>
+
+        </select>
+
+        <button type="submit">créer</button>
+    </form>
+</body>
+</html>
+
+voici mon model user.php :
+<?php
+class User {
+        
+    private ?int $id;
+    private string $firstname;
+    private string $lastname;
+    private string $email;
+    private string $passwordHash;
+    private int $role;
+    private ?DateTime $createdAt;
+
+    public function __construct(string $firstname, string $lastname, string $email, string $passwordHash, int $role, ?int $id = null, ?DateTime $createdAt = null) {
+        $this->id = $id;
+        $this->firstname = $firstname;
+        $this->lastname = $lastname;
+        $this->email = $email;  
+        $this->passwordHash = $passwordHash;
+        $this->role = $role;
+        $this->createdAt = $createdAt;
+    }
+
+    public function getId() {
+        return $this->id;
+    }
+
+    public function getFirstname() {
+        return $this->firstname;
+    }
+
+    public function getLastname() {
+        return $this->lastname;
+    }
+
+    public function getEmail() {
+        return $this->email;
+    }
+
+    public function getRoleId() {
+        return $this->role;
+    }
+
+    public function getPasswordHash(): string {
+        return $this->passwordHash;
+    }
+
+}
+
+
+
+
+?>
+
+voici mon controller userController.php :
+
+<?php
+require_once __DIR__ . '/../models/userDao.php';
+
+class UserController{
+
+
+    public function createUser(){
+ 
+        $firstname = trim($_POST['firstname']) ?? '';
+        $lastname = trim($_POST['lastname']) ?? '';
+        $email =trim($_POST['email']) ?? '';
+        $role =(int)$_POST['role_id'] ?? 0;
+        $password = password_hash($password, PASSWORD_DEFAULT);
+
+        userDao::createUser(new User($firstname, $lastname, $email, $password, $role));
+
+         //redirection
+        //header('Location: index.php?controller=UserController&action=index');
+
+        exit;
+    }
+  
+
+}
+?>
+
+et voici mon DAO userDao.php :
+
+<?php
+//data access object
+
+require_once __DIR__ . '/../config/db.php';
+require_once __DIR__ . '/role/php';
+require_once __DIR__ . '/user.php';
+
+
+
+class UserDao{
+
+    public static function createUser($user){
+
+        $pdo = Db::getConnection();
+
+        $stmt = $pdo->prepare("INSERT into utilisateur (firstname, lastname, email, role_id, password) 
+        values (:firstname, :lastname, :email, :role_id, :password)");
+
+        $stmt->bindParam();
+
+        $stmt->bindValue(":firstname", $user->getFirstName());
+        $stmt->bindValue(":lastname", $user->getLastName());
+        $stmt->bindValue(":email", $user->getEmail());
+        $stmt->bindValue(":role_id", $user->getRoleId());
+        $stmt->bindValue(":password", $user->getPasswordHash());
+        $stmt->execute();
+
+    }
+}
+?>
+
+leurs chemins sont les suivants:
+- club_lecture/App/

@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/../models/user/userDao.php';
+require_once __DIR__ . '/../models/user/User.php';
 
 class UserController{
 
@@ -36,8 +37,7 @@ class UserController{
 
         userDao::createUser(new User($firstname, $lastname, $email, $password, $role));
 
-         //redirection
-        //header('Location: index.php?controller=UserController&action=index');
+        header('Location: index.php?controller=User&action=displayCreateForm');
 
         exit;
     }

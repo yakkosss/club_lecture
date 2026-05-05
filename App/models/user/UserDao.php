@@ -2,7 +2,7 @@
 //data access object
 
 require_once __DIR__ . '/../../config/Db.php';
-require_once __DIR__ . '/user.php';
+require_once __DIR__ . '/User.php';
 
 
 class UserDao{
@@ -33,6 +33,19 @@ class UserDao{
 
         return $result;
 
+    }
+
+    public static function findByEmail($email) {
+        $pdo = Db::getConnection();
+
+        $stmt = $pdo->prepare("SELECT u.id, u.firstname, u.lastname, u.email,
+            u.password_hash, r.role_id, r.name as roles FROM users u JOIN roles r ON u.role_id = r.role_id WHERE u.email = :email");
+
+        $stmt->bindValue(":email", $email);
+        $stmt->execute();
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        return $result;
     }
 
     //CHANGER POUR INSTANCIER UN OBJET (UTILISER GETTER/SETTER)

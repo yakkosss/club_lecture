@@ -3,22 +3,28 @@
 // ========================
 // AUTLOAD (simple)
 // ========================
-require_once __DIR__ . '/App/controllers/UserController.php';
+require_once __DIR__ . '/../App/controllers/UserController.php';
+require_once __DIR__ . '/../App/controllers/HomeController.php';
+require_once __DIR__ . '/../App/controllers/AuthController.php';
 
 // ajoute les autres controllers ici plus tard
+
+$env = parse_ini_file(__DIR__ . '/../.env');
+
+define('BASE_URL', $env['BASE_URL']);
 
 // ========================
 // LECTURE URL
 // ========================
-$controller = $_GET['controller'] ?? 'user';
-$action = $_GET['action'] ?? 'displayCreateForm';
+$controller = $_GET['controller'] ?? 'Auth';
+$action = $_GET['action'] ?? 'displayLoginForm';
 
 // ========================
 // CONSTRUCTION DYNAMIQUE
 // ========================
 
 // Exemple : user → UserController
-$controllerClass = ucfirst($controller) . 'Controller';
+$controllerClass = $controller . 'Controller';
 
 // Vérification du controller
 if (!class_exists($controllerClass)) {

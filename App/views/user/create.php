@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,7 +7,7 @@
 </head>
 <body>
     <h2>Créer un utilisateur</h2>
-    <form action="index.php?controller=user&action=createUser" method="POST">
+    <form action="<?= BASE_URL ?>index.php?controller=User&action=createUser" method="POST">
         
         <label for="firstname">Prénom</label>
         <input type="text" name="firstname" id="firstname" required>

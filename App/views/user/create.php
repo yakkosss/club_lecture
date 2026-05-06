@@ -23,9 +23,9 @@
 
         <label for="role_id">Rôle</label>
         <select name="role_id" id="role_id" required>
-            <option value="1">Administrateur</option>
-            <option value="2">Moderateur</option>
-            <option value="3">Membre</option>
+            <option value="admin">Administrateur</option>
+            <option value="moderator">Moderateur</option>
+            <option value="member">Membre</option>
 
         </select>
 

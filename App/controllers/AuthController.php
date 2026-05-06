@@ -18,8 +18,8 @@ class AuthController {
             header('Location: index.php?controller=Home&action=index');
             exit;
         }
-        
         echo "Un ou plusieurs identifiants sont incorrects";
+        exit;
 
     }
 

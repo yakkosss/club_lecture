@@ -13,10 +13,12 @@ $env = parse_ini_file(__DIR__ . '/../.env');
 
 define('BASE_URL', $env['BASE_URL']);
 
+session_start();
+
 // ========================
 // LECTURE URL
 // ========================
-$controller = $_GET['controller'] ?? 'Auth';
+$controller = ucfirst($_GET['controller'] ?? 'auth');
 $action = $_GET['action'] ?? 'displayLoginForm';
 
 // ========================

@@ -1,4 +1,7 @@
 <?php
+
+require_once __DIR__ . '/../role/Role.php';
+
 class User {
         
     private ?int $id;
@@ -6,10 +9,10 @@ class User {
     private string $lastname;
     private string $email;
     private string $passwordHash;
-    private int $role;
+    private Role $role;
     private ?DateTime $createdAt;
 
-    public function __construct(string $firstname, string $lastname, string $email, string $passwordHash, int $role, ?int $id = null, ?DateTime $createdAt = null) {
+    public function __construct(string $firstname, string $lastname, string $email, string $passwordHash, Role $role, ?int $id = null, ?DateTime $createdAt = null) {
         $this->id = $id;
         $this->firstname = $firstname;
         $this->lastname = $lastname;
@@ -35,7 +38,7 @@ class User {
         return $this->email;
     }
 
-    public function getRoleId() {
+    public function getRole() {
         return $this->role;
     }
 

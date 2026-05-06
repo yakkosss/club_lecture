@@ -38,14 +38,19 @@ class UserDao{
     public static function findByEmail($email) {
         $pdo = Db::getConnection();
 
-        $stmt = $pdo->prepare("SELECT u.id, u.firstname, u.lastname, u.email,
-            u.password_hash, r.role_id, r.name as roles FROM users u JOIN roles r ON u.role_id = r.role_id WHERE u.email = :email");
+        $stmt = $pdo->prepare("SELECT u.*, r.name AS role FROM users u JOIN roles r ON u.role_id = r.id WHERE u.email = :email");
 
         $stmt->bindValue(":email", $email);
         $stmt->execute();
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        return $result;
+        if(!$result)
+            return null;
+
+        $user = new User($result['firstname'], $result['lastname'], $result['email'], $result['password_hash'], Role::from($result['role']), $result['id'], new DateTime($result['created_at']));
+        
+
+        return $user;
     }
 
     //CHANGER POUR INSTANCIER UN OBJET (UTILISER GETTER/SETTER)

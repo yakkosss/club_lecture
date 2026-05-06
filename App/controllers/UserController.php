@@ -32,7 +32,7 @@ class UserController{
         $firstname = trim($_POST['firstname']) ?? '';
         $lastname = trim($_POST['lastname']) ?? '';
         $email =trim($_POST['email']) ?? '';
-        $role =(int)$_POST['role_id'] ?? 0;
+        $role =(int)$_POST['role'] ?? 'member';
         $password = password_hash(trim($_POST['password']), PASSWORD_DEFAULT);
 
         userDao::createUser(new User($firstname, $lastname, $email, $password, $role));

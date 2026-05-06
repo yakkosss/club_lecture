@@ -11,13 +11,13 @@
 <p>
     Connecté en tant que :
     <strong>
-        <?= htmlspecialchars($user['firstname'] ?? $user['email']) ?>
+        <?= htmlspecialchars($_SESSION['user']['firstname']) ?>
     </strong>
 </p>
 
 <p>
     Rôle :
-    <?= htmlspecialchars($user['role']) ?>
+    <?= htmlspecialchars($_SESSION['user']['role']->value) ?>
 </p>
 
 <a href="<?= BASE_URL ?>index.php?controller=Auth&action=logout">

@@ -17,7 +17,6 @@ class AuthService {
             return false;
         }
 
-        session_start();
 
         $_SESSION['user'] = ['id' => $user->getId(), 'firstname' => $user->getFirstname(), 
             'lastname' => $user->getLastname(), 'email' => $user->getEmail(), 

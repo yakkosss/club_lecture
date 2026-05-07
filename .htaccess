@@ -1,0 +1,7 @@
+# Bloque l'accès direct au .env et autres fichiers sensibles à la racine.
+<FilesMatch "^(\.env.*|composer\.(json|lock)|package(-lock)?\.json|README\.md|.+\.txt|.+\.sql)$">
+    Require all denied
+</FilesMatch>
+
+# Désactive le listage des dossiers à la racine
+Options -Indexes

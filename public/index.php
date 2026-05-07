@@ -1,47 +1,60 @@
 <?php
 
 // ========================
-// AUTLOAD (simple)
+// CONFIGURATION
 // ========================
-require_once __DIR__ . '/../App/controllers/UserController.php';
-require_once __DIR__ . '/../App/controllers/HomeController.php';
-require_once __DIR__ . '/../App/controllers/AuthController.php';
-
-// ajoute les autres controllers ici plus tard
-
 $env = parse_ini_file(__DIR__ . '/../.env');
-
+if (!$env) {
+    http_response_code(500);
+    exit('Configuration .env introuvable.');
+}
 define('BASE_URL', $env['BASE_URL']);
 
 session_start();
 
 // ========================
+// AUTLOAD (simple)
+// ========================
+require_once __DIR__ . '/../App/controllers/UserController.php';
+require_once __DIR__ . '/../App/controllers/HomeController.php';
+require_once __DIR__ . '/../App/controllers/AuthController.php';
+require_once __DIR__ . '/../App/controllers/BookController.php';
+require_once __DIR__ . '/../App/controllers/DocumentController.php';
+// ajoute les autres controllers ici plus tard
+
+// ========================
 // LECTURE URL
 // ========================
-$controller = ucfirst($_GET['controller'] ?? 'auth');
-$action = $_GET['action'] ?? 'displayLoginForm';
+// Par défaut : si l'utilisateur est connecté on l'envoie sur l'accueil,
+// sinon sur le formulaire de connexion.
+if (!empty($_SESSION['user'])) {
+    $defaultController = 'Home';
+    $defaultAction     = 'index';
+} else {
+    $defaultController = 'Auth';
+    $defaultAction     = 'displayLoginForm';
+}
+
+$controller = ucfirst($_GET['controller'] ?? $defaultController);
+$action     = $_GET['action']             ?? $defaultAction;
 
 // ========================
-// CONSTRUCTION DYNAMIQUE
+// 404 — Controller / Action introuvables
 // ========================
-
-// Exemple : user → UserController
-$controllerClass = $controller . 'Controller';
-
-// Vérification du controller
-if (!class_exists($controllerClass)) {
+function render404(): void {
     http_response_code(404);
-    echo "Controller introuvable";
+    require __DIR__ . '/../App/views/errors/404.php';
     exit;
 }
 
-$ctrl = new $controllerClass();
+$controllerClass = $controller . 'Controller';
+if (!class_exists($controllerClass)) {
+    render404();
+}
 
-// Vérification de la méthode
+$ctrl = new $controllerClass();
 if (!method_exists($ctrl, $action)) {
-    http_response_code(404);
-    echo "Action introuvable";
-    exit;
+    render404();
 }
 
 // ========================

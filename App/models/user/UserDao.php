@@ -3,106 +3,121 @@
 
 require_once __DIR__ . '/../../config/Db.php';
 require_once __DIR__ . '/User.php';
+require_once __DIR__ . '/../role/Role.php';
 
 
-class UserDao{
+class UserDao {
 
-    public static function getAllUsers(){
-
+    /**
+     * Liste l'ensemble des utilisateurs avec leur rôle.
+     * Retourne un tableau associatif (utilisé directement par la vue).
+     */
+    public static function getAllUsers(): array {
         $pdo = Db::getConnection();
 
-        $stmt = $pdo->prepare("SELECT u.id_users, u.name, u.firstname, u.email,
-            u.password, r.irole_id, r.n as role FROM users u JOIN role r ON u.role_id = r.role_id");
-
-        $stmt->executee();
-        $result = $stmt->fetch(PDO::FETCH_ASSOC);
-
-        return $result;
+        $stmt = $pdo->prepare(
+            "SELECT u.id, u.firstname, u.lastname, u.email, u.created_at, r.name AS role
+             FROM users u
+             JOIN roles r ON u.role_id = r.id
+             ORDER BY u.created_at DESC"
+        );
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-
-    public static function getUserByID(){
-
+    /**
+     * Récupère un utilisateur par son id.
+     */
+    public static function findById(int $id): ?User {
         $pdo = Db::getConnection();
 
-        $stmt = $pdo->prepare("SELECT u.id_users, u.name, u.firstname, u.email,
-            u.password, r.role_id, r.name as role FROM users u JOIN role r ON u.role_id = r.role_id");
-
-        $stmt->executee();
-        $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-        return $result;
-
-    }
-
-    public static function findByEmail($email) {
-        $pdo = Db::getConnection();
-
-        $stmt = $pdo->prepare("SELECT u.*, r.name AS role FROM users u JOIN roles r ON u.role_id = r.id WHERE u.email = :email");
-
-        $stmt->bindValue(":email", $email);
+        $stmt = $pdo->prepare(
+            "SELECT u.*, r.name AS role
+             FROM users u
+             JOIN roles r ON u.role_id = r.id
+             WHERE u.id = :id"
+        );
+        $stmt->bindValue(':id', $id, PDO::PARAM_INT);
         $stmt->execute();
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        if(!$result)
-            return null;
-
-        $user = new User($result['firstname'], $result['lastname'], $result['email'], $result['password_hash'], Role::from($result['role']), $result['id'], new DateTime($result['created_at']));
-        
-
-        return $user;
+        return $result ? self::hydrate($result) : null;
     }
 
-    //CHANGER POUR INSTANCIER UN OBJET (UTILISER GETTER/SETTER)
-    public static function createUser($user){
-
+    /**
+     * Récupère un utilisateur par son email (utilisé à la connexion).
+     */
+    public static function findByEmail(string $email): ?User {
         $pdo = Db::getConnection();
 
-        $stmt = $pdo->prepare("INSERT into users (firstname, lastname, email, role_id, password_hash) 
-        values (:firstname, :lastname, :email, :role_id, :password_hash)");
-
-        $stmt->bindValue(":firstname", $user->getFirstName());
-        $stmt->bindValue(":lastname", $user->getLastName());
-        $stmt->bindValue(":email", $user->getEmail());
-        $stmt->bindValue(":role_id", $user->getRoleId());
-        $stmt->bindValue(":password_hash", $user->getPasswordHash());
+        $stmt = $pdo->prepare(
+            "SELECT u.*, r.name AS role
+             FROM users u
+             JOIN roles r ON u.role_id = r.id
+             WHERE u.email = :email"
+        );
+        $stmt->bindValue(':email', $email);
         $stmt->execute();
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
+        return $result ? self::hydrate($result) : null;
     }
 
-
-    public static function updateUser($user_id){
-
-        $pdo = Db::getConnection();
-        //on veut pouvoir utiliser get user by ID pour ne pas afficher l'id dans le formulaire
-        
-
-        $stmt = $pdo->prepare("UPDATE users SET name = ':name', firstname = ':firstname', 
-            email = ':email', role_id = ':role_id', password = ':password' WHERE user_id = ':user_id'");
-
-        $stmt->bindValue(":name", $name);
-        $stmt->bindValue(":firstname", $firstname);
-        $stmt->bindValue(":email", $email);
-        $stmt->bindValue(":role_id", $role_id);
-        $stmt->bindValue(":password", $password);
-        $stmt->bindValue(":user_id", $user_id);
-        $stmt->execute();
-
-    }
-
-
-    public static function archiveUser($archived, $user_id){
-
+    /**
+     * Crée un nouvel utilisateur. Le rôle est résolu via la table 'roles'
+     * pour ne pas dépendre des id auto-incrémentés côté applicatif.
+     */
+    public static function createUser(User $user): int {
         $pdo = Db::getConnection();
 
-        $stmt = $pdo->prepare("UPDATE users SET archived = ':archived' WHERE id = ':user_id'");
-
-        $stmt->bindParam();
-        $stmt->bindValue(":archived", $archived);
-        $stmt->bindValue(":user_id", $user_id);
+        $stmt = $pdo->prepare(
+            "INSERT INTO users (firstname, lastname, email, password_hash, role_id)
+             VALUES (
+                :firstname,
+                :lastname,
+                :email,
+                :password_hash,
+                (SELECT id FROM roles WHERE name = :role_name)
+             )"
+        );
+        $stmt->bindValue(':firstname',     $user->getFirstname());
+        $stmt->bindValue(':lastname',      $user->getLastname());
+        $stmt->bindValue(':email',         $user->getEmail());
+        $stmt->bindValue(':password_hash', $user->getPasswordHash());
+        $stmt->bindValue(':role_name',     $user->getRole()->value);
         $stmt->execute();
 
+        return (int) $pdo->lastInsertId();
     }
-    
+
+    /**
+     * Met à jour le rôle d'un utilisateur (admin uniquement, EF-02).
+     */
+    public static function updateRole(int $userId, Role $role): void {
+        $pdo = Db::getConnection();
+
+        $stmt = $pdo->prepare(
+            "UPDATE users
+             SET role_id = (SELECT id FROM roles WHERE name = :role_name)
+             WHERE id = :id"
+        );
+        $stmt->bindValue(':role_name', $role->value);
+        $stmt->bindValue(':id', $userId, PDO::PARAM_INT);
+        $stmt->execute();
+    }
+
+    /**
+     * Construit un User à partir d'une ligne de la BDD.
+     */
+    private static function hydrate(array $row): User {
+        return new User(
+            $row['firstname'],
+            $row['lastname'],
+            $row['email'],
+            $row['password_hash'],
+            Role::from($row['role']),
+            (int) $row['id'],
+            new DateTime($row['created_at'])
+        );
+    }
 }
-?>

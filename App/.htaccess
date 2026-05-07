@@ -1,0 +1,5 @@
+# Tous les fichiers du dossier App/ sont privés.
+# Le seul point d'entrée HTTP est public/index.php — qui inclut les
+# fichiers de App/ via le système de fichiers (require/include) et non
+# via Apache. Aucun chemin sous App/ ne doit être servi directement.
+Require all denied

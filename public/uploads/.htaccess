@@ -1,0 +1,8 @@
+# Empêche l'exécution de tout script (PHP, etc.) depuis le dossier d'uploads.
+# Les fichiers sont seulement servis comme contenu statique.
+<FilesMatch "\.(php|phtml|php\d+|pl|py|jsp|asp|sh|cgi)$">
+    Require all denied
+</FilesMatch>
+
+# Désactive l'auto-indexation du dossier
+Options -Indexes

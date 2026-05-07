@@ -1,66 +1,56 @@
 <?php
-require_once __DIR__ . '/../models/user/userDao.php';
+require_once __DIR__ . '/../models/user/UserDao.php';
 require_once __DIR__ . '/../models/user/User.php';
+require_once __DIR__ . '/../models/role/Role.php';
+require_once __DIR__ . '/../services/AccessGuard.php';
 
-class UserController{
+class UserController {
 
-    public static function index(){
-
-    //récupérer et lister les données
+    /**
+     * Liste des utilisateurs — réservée aux admins.
+     */
+    public function index(): void {
+        AccessGuard::requireRole('admin');
         $users = UserDao::getAllUsers();
-        require_once __DIR__ . '/../views/users/index.php';
-
+        require __DIR__ . '/../views/users/index.php';
     }
 
-    public static function displayCreateForm(){
-        require_once __DIR__ . '/../views/user/create.php';
+    public function displayCreateForm(): void {
+        AccessGuard::requireRole('admin');
+        require __DIR__ . '/../views/user/create.php';
     }
-    
-    public static function displayUpdateForm(){
-        $id_user = $_GET["id_user"];
 
-        if($id_user) {
-            //ajouter la possiilité de récupérer
+    public function createUser(): void {
+        AccessGuard::requireRole('admin');
 
-            //trasmettre les donées de user à la vue
-            require_once __DIR__ .'/../views/users/update.php';
-            
+        $firstname = trim($_POST['firstname'] ?? '');
+        $lastname  = trim($_POST['lastname'] ?? '');
+        $email     = trim($_POST['email'] ?? '');
+        $rolePost  = $_POST['role'] ?? 'member';
+        $password  = $_POST['password'] ?? '';
+
+        if ($firstname === '' || $lastname === '' || $email === '' || $password === '') {
+            $_SESSION['flash_error'] = "Tous les champs sont obligatoires.";
+            header('Location: ' . BASE_URL . 'index.php?controller=User&action=displayCreateForm');
+            exit;
         }
-    }
-    public function createUser(){
-      
-        $firstname = trim($_POST['firstname']) ?? '';
-        $lastname = trim($_POST['lastname']) ?? '';
-        $email =trim($_POST['email']) ?? '';
-        $role =(int)$_POST['role'] ?? 'member';
-        $password = password_hash(trim($_POST['password']), PASSWORD_DEFAULT);
-
-        userDao::createUser(new User($firstname, $lastname, $email, $password, $role));
-
-        header('Location: index.php?controller=User&action=displayCreateForm');
-
-        exit;
-    }
-    
-    public function updateUser(){
-        $nom = trim($_POST['name']) ?? '';
-        $prenom = trim($_POST['firstname']) ?? '';
-        $email =trim($_POST['email']) ?? '';
-        $role =(int)$_POST['role_id'] ?? 0;
-        $password = password_hash("test", PASSWORD_DEFAULT);
-        $user_id = (int)($_POST['user_id']);
-
-        if($id_user){
-            userDao::updateUser($user_id);
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            $_SESSION['flash_error'] = "L'adresse email n'est pas valide.";
+            header('Location: ' . BASE_URL . 'index.php?controller=User&action=displayCreateForm');
+            exit;
         }
 
-        //redirection
-        header('Location: index.php?controller=UserController&action=index');
+        $role = Role::tryFrom($rolePost) ?? Role::member;
+        $hash = password_hash($password, PASSWORD_DEFAULT);
 
+        try {
+            UserDao::createUser(new User($firstname, $lastname, $email, $hash, $role));
+            $_SESSION['flash_success'] = "Utilisateur créé.";
+        } catch (Throwable $e) {
+            $_SESSION['flash_error'] = "Impossible de créer l'utilisateur (email déjà utilisé ?).";
+        }
+
+        header('Location: ' . BASE_URL . 'index.php?controller=User&action=displayCreateForm');
         exit;
     }
-   
- 
-   
 }
-?>

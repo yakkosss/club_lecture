@@ -1,0 +1,152 @@
+ Cahier des charges
+Application web - Gestionnaire de Club de Lecture
+Projet : Gestionnaire de Club de Lecture (PHP poo + MySQLi ou pdo)
+
+Objectif : Gérer membres, lectures, documents, avis, progression et sessions, avec un
+système de rôles.
+
+Date : 02/03/2026 (Europe/Paris)
+Version : 1.0
+
+Sommaire
+
+1. Contexte et objectifs
+
+2. Périmètre du projet
+
+3. Acteurs et droits
+
+4. Exigences fonctionnelles
+
+5. Exigences non-fonctionnelles
+
+6. Données et base de données
+
+
+1. Contexte et objectifs
+Une structure (club de lecture / association / équipe de chronique) souhaite centraliser dans
+une application web la gestion des membres, des lectures en cours, des documents de
+lecture (PDF, fiches), des sessions (live/rencontre) et du suivi (progression, avis). Le système
+doit rester simple à déployer (MAMP + MySQLi), tout en appliquant des règles de sécurité et
+une organisation de code propre en PHP procédural.
+
+Objectifs principaux
+• Réduire l'usage de fichiers dispersés (Drive/WhatsApp) en centralisant documents et
+informations de lecture.
+• Assurer une traçabilité: qui a ajouté quoi, quand (documents, lectures, avis).
+• Permettre un suivi individuel (progression) et collectif (statistiques simples).
+• Gérer les accès par rôles: admin, modérateur, membre.
+
+Hors objectifs (V1)
+
+• Paiement en ligne, boutique, gestion d'abonnements.
+• Messagerie instantanée complète type réseau social.
+• Le web responsive suffit.
+
+2. Périmètre du projet
+
+
+Le projet couvre les modules suivants:
+• Authentification: inscription, connexion, gestion de session, déconnexion.
+• Rôles: admin/modérateur/membre, contrôle d'accès par page et par action.
+• Lectures: CRUD des livres, dates, couverture (upload).
+• Documents: upload et téléchargement sécurisé de PDF et ressources.
+• Avis: note + commentaire (avec modération possible).
+• Progression: pourcentage de lecture par utilisateur et par livre.
+• Sessions: planification d'un live/rencontre, inscriptions.
+• Dashboard: statistiques simples.
+Contraintes et hypothèses
+• Déploiement local: MAMP (Apache + MySQL) et navigateur moderne.
+• PHP POO Organisation en dossiers (architecture mvc organisé).
+• MySQLi ou pdo(requêtes préparées obligatoires).
+• JS léger pour l'interactivité (progression, étoiles, recherche instantanée).
+• CSS pour une interface claire et responsive.
+
+
+
+
+
+
+3. Acteurs et droits
+Les acteurs sont définis pour contrôler précisément les actions possibles. Le système doit
+refuser toute action non autorisée, même si l'URL est saisie manuellement.
+Administrateur 
+Gère tout:
+ membres, rôles,lectures, documents, stats.
+Modérateur Anime les sessions,
+valide/modère avis,
+assure le suivi.
+Membre
+Consulte, progresse,donne un avis et télécharge.
+
+
+
+
+ Exigences fonctionnelles
+• Une action interdite retourne une page 403 (ou message) sans exécuter la requête.
+• Un admin peut promouvoir/rétrograder un utilisateur.
+EF-03 - CRUD Lectures
+• Créer/modifier/supprimer une lecture (livre).
+• Uploader une couverture image (jpg/png/webp) avec validation de taille et type.
+• Afficher la fiche d'une lecture avec docs, avis, progression moyenne.
+EF-04 - Documents
+• Uploader un PDF lié à une lecture et enregistrer les métadonnées en BDD.
+• Téléchargement via un script (download.php) qui vérifie les droits avant d'envoyer le
+fichier.
+• Suppression possible par admin/Les exigences ci-dessous servent de base aux critères d'acceptation. Chaque exigence doit
+être testable (preuve par scénario).
+EF-01 - Inscription et connexion
+• Un visiteur peut créer un compte avec nom et email unique.
+• Le mot de passe est haché (ex: password_hash) et jamais stocké en clair.
+• Après connexion, une session PHP est ouverte et l'utilisateur est redirigé vers le
+dashboard.
+EF-02 - Gestion des rôles et accès
+• Chaque page sensible vérifie la session et le rôle Modérateur (fichier + enregistrement BDD).
+EF-05 - Avis
+• Un membre peut publier une note (1-5) et un commentaire.
+• Un membre peut modifier/supprimer son propre avis.
+• Admin/modérateur peut masquer un avis (modération) sans le supprimer définitivement
+(option).
+EF-06 - Progression
+• Un membre peut enregistrer un pourcentage (0-100) pour une lecture.
+• Le dashboard affiche la progression personnelle et une progression moyenne par lecture.
+• Le champ pourcentage est borné (pas de valeurs négatives ou >100).
+EF-07 - Sessions
+• Créer une session liée à une lecture (date/heure, lieu ou lien, description).
+• Les membres peuvent s'inscrire à une session.
+• Le modérateur peut voir la liste des inscrits.
+
+5. Exigences non-fonctionnelles
+Les exigences non-fonctionnelles garantissent qualité, sécurité et maintenabilité.
+Performance et UX
+• Interface responsive (mobile/desktop).
+• Recherche et filtres simples (JS) sans rechargement complet si possible.
+Qualité de code
+• Organisation en dossiers 
+• Requêtes préparées MySQLi partout (anti-injection).
+• Gestion d'erreurs propre (messages utilisateurs).
+Compatibilité
+• PHP 8.x conseillé (MAMP).
+• Navigateurs: Chrome/Firefox/Safari récents.
+Accessibilité (minimum)
+• Contraste correct, tailles de police lisibles, labels sur formulaires.
+
+6. Données et base de données
+La base de données est relationnelle. Les tables sont normalisées pour éviter la duplication
+et faciliter les jointures (ex: documents liés à books, avis liés à users et books).
+Schéma logique (V1)
+Description
+id, nom, email, password_hash, role, statut, created_at Comptes et rôles. email unique.
+id, titre, auteur, description, cover_path, date_debut, date_fin, created_by Lectures gérées par l'équipe.
+id, book_id, filename, filepath, mime, size, uploaded_by, uploaded_at Documents liés à un livre (PDF, fiches).
+id, book_id, user_id, note, commentaire, created_at, updated_at Avis + note. 1 avis par user et livre (contr
+Suivi de progression par utilisateur et lect
+id, book_id, titre, date_heure, lien, lieu, description, created_by Lives/rencontres. Peut être en ligne ou phy
+session_attendance id, session_id, user_id, statut, created_at Inscription/présence à une session.
+Table Champs clés users books documents reviews progress id, book_id, user_id, pourcentage, updated_at sessions Règles d'intégrité recommandées
+• email unique dans users.
+• Contrainte logique: 1 avis maximum par user et par book.
+• progress: 1 ligne par user et book (update au lieu d'insert multiples).
+• documents: suppression d'un book doit supprimer ses documents (au minimum côté applicatif).
+
+

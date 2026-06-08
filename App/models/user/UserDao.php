@@ -107,6 +107,16 @@ class UserDao {
     }
 
     /**
+     * Supprime un utilisateur par son id.
+     */
+    public static function deleteById(int $id): void {
+        $pdo  = Db::getConnection();
+        $stmt = $pdo->prepare("DELETE FROM users WHERE id = :id");
+        $stmt->bindValue(':id', $id, PDO::PARAM_INT);
+        $stmt->execute();
+    }
+
+    /**
      * Construit un User à partir d'une ligne de la BDD.
      */
     private static function hydrate(array $row): User {

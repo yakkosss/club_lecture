@@ -35,6 +35,7 @@ $pageTitle = $pageTitle ?? 'Club de Lecture';
                 <?php if ($currentUser): ?>
                     <a href="<?= BASE_URL ?>index.php?controller=Home&action=index">Accueil</a>
                     <a href="<?= BASE_URL ?>index.php?controller=Book&action=index">Lectures</a>
+                    <a href="<?= BASE_URL ?>index.php?controller=Session&action=index">Sessions</a>
                     <?php if (in_array($currentUser['role'], ['admin'], true)): ?>
                         <a href="<?= BASE_URL ?>index.php?controller=User&action=index">Utilisateurs</a>
                     <?php endif; ?>

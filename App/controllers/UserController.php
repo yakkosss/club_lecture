@@ -53,4 +53,63 @@ class UserController {
         header('Location: ' . BASE_URL . 'index.php?controller=User&action=displayCreateForm');
         exit;
     }
+
+    /**
+     * Promouvoir / rétrograder un utilisateur (EF-02) — admin uniquement.
+     */
+    public function updateRole(): void {
+        $currentUser = AccessGuard::requireRole('admin');
+
+        $targetId = (int) ($_POST['user_id'] ?? 0);
+        $rolePost  = $_POST['role'] ?? '';
+
+        // Un admin ne peut pas rétrograder son propre compte
+        if ($targetId === (int) $currentUser['id']) {
+            $_SESSION['flash_error'] = "Vous ne pouvez pas modifier votre propre rôle.";
+            header('Location: ' . BASE_URL . 'index.php?controller=User&action=index');
+            exit;
+        }
+
+        $role = Role::tryFrom($rolePost);
+        if (!$role || $targetId <= 0) {
+            $_SESSION['flash_error'] = "Rôle invalide.";
+            header('Location: ' . BASE_URL . 'index.php?controller=User&action=index');
+            exit;
+        }
+
+        try {
+            UserDao::updateRole($targetId, $role);
+            $_SESSION['flash_success'] = "Rôle mis à jour.";
+        } catch (Throwable $e) {
+            $_SESSION['flash_error'] = "Impossible de modifier le rôle.";
+        }
+
+        header('Location: ' . BASE_URL . 'index.php?controller=User&action=index');
+        exit;
+    }
+
+    /**
+     * Suppression d'un utilisateur — admin uniquement.
+     */
+    public function deleteUser(): void {
+        $currentUser = AccessGuard::requireRole('admin');
+
+        $targetId = (int) ($_POST['user_id'] ?? 0);
+
+        if ($targetId === (int) $currentUser['id']) {
+            $_SESSION['flash_error'] = "Vous ne pouvez pas supprimer votre propre compte.";
+            header('Location: ' . BASE_URL . 'index.php?controller=User&action=index');
+            exit;
+        }
+
+        try {
+            UserDao::deleteById($targetId);
+            $_SESSION['flash_success'] = "Utilisateur supprimé.";
+        } catch (Throwable $e) {
+            $_SESSION['flash_error'] = "Impossible de supprimer cet utilisateur.";
+        }
+
+        header('Location: ' . BASE_URL . 'index.php?controller=User&action=index');
+        exit;
+    }
 }

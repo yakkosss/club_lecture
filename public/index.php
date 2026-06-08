@@ -20,7 +20,10 @@ require_once __DIR__ . '/../App/controllers/HomeController.php';
 require_once __DIR__ . '/../App/controllers/AuthController.php';
 require_once __DIR__ . '/../App/controllers/BookController.php';
 require_once __DIR__ . '/../App/controllers/DocumentController.php';
-// ajoute les autres controllers ici plus tard
+require_once __DIR__ . '/../App/controllers/ReviewController.php';
+require_once __DIR__ . '/../App/controllers/ProgressController.php';
+require_once __DIR__ . '/../App/controllers/SessionController.php';
+require_once __DIR__ . '/../App/controllers/CommentsController.php';
 
 // ========================
 // LECTURE URL

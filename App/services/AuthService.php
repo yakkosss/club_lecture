@@ -6,11 +6,6 @@ require_once __DIR__ . '/../models/role/Role.php';
 
 class AuthService {
 
-    /**
-     * Tente de connecter un utilisateur. Retourne true en cas de succès.
-     * Le rôle est stocké en session sous forme de string ('admin'|'moderator'|'member')
-     * pour faciliter les comparaisons côté vues et guards.
-     */
     public static function login(string $email, string $password): bool {
         $user = UserDao::findByEmail($email);
 

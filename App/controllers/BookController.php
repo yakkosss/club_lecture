@@ -2,6 +2,9 @@
 require_once __DIR__ . '/../models/book/BookDao.php';
 require_once __DIR__ . '/../models/book/Book.php';
 require_once __DIR__ . '/../models/document/DocumentDao.php';
+require_once __DIR__ . '/../models/review/ReviewDao.php';
+require_once __DIR__ . '/../models/progress/ProgressDao.php';
+require_once __DIR__ . '/../models/comment/CommentDao.php';
 require_once __DIR__ . '/../services/AccessGuard.php';
 require_once __DIR__ . '/../services/UploadService.php';
 
@@ -43,7 +46,26 @@ class BookController {
         }
 
         // Données associées passées à la vue (respect MVC : la vue ne fait pas de SQL).
-        $documents = DocumentDao::getByBookId((int) $book['id']);
+        $documents   = DocumentDao::getByBookId((int) $book['id']);
+        $avgNote     = ReviewDao::getAverageNote((int) $book['id']);
+        $avgProgress = ProgressDao::getAverageByBook((int) $book['id']);
+
+        $currentUser = $_SESSION['user'] ?? null;
+        // Avis : admins/modérateurs voient tous (y compris masqués), membres uniquement les visibles
+        if ($currentUser && in_array($currentUser['role'], ['admin', 'moderator'], true)) {
+            $reviews = ReviewDao::getAllByBookId((int) $book['id']);
+        } else {
+            $reviews = ReviewDao::getVisibleByBookId((int) $book['id']);
+        }
+        $myReview   = $currentUser ? ReviewDao::findByBookAndUser((int) $book['id'], (int) $currentUser['id']) : null;
+        $myProgress = $currentUser ? ProgressDao::findByBookAndUser((int) $book['id'], (int) $currentUser['id']) : null;
+
+        // Commentaires
+        if ($currentUser && in_array($currentUser['role'], ['admin', 'moderator'], true)) {
+            $comments = CommentDao::getAllByBookId((int) $book['id']);
+        } else {
+            $comments = CommentDao::getApprovedByBookId((int) $book['id']);
+        }
 
         require __DIR__ . '/../views/book/show.php';
     }
